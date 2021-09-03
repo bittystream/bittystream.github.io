@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="最近一周在身心崩溃中度过，但是跟“我貌似会找LR(1)的向前符号串了”并无任何冲突。Anyways，without further ado，下面就用及其低级的措辞谈谈我对LR(1)分析浅薄的理解。 先用我自己的话对语法分析的几个相关terminology解释一下子。  FIRST集FIRST集为某语法中与某符号（串）相邻并出现在其前方的符号的集合。要确定FIRST(A)可从三个方向考虑（大写字母为">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解LR(1)分析的向前看符号串">
+<meta property="og:url" content="http://bittystream.github.io/2021/04/11/go-lr1/index.html">
+<meta property="og:site_name" content="Bitty的博客">
+<meta property="og:description" content="最近一周在身心崩溃中度过，但是跟“我貌似会找LR(1)的向前符号串了”并无任何冲突。Anyways，without further ado，下面就用及其低级的措辞谈谈我对LR(1)分析浅薄的理解。 先用我自己的话对语法分析的几个相关terminology解释一下子。  FIRST集FIRST集为某语法中与某符号（串）相邻并出现在其前方的符号的集合。要确定FIRST(A)可从三个方向考虑（大写字母为">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://bittystream.github.io/2021/04/11/go-lr1/question.png">
+<meta property="article:published_time" content="2021-04-11T10:24:21.000Z">
+<meta property="article:modified_time" content="2021-04-11T11:30:50.411Z">
+<meta property="article:author" content="Liao yz">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://bittystream.github.io/2021/04/11/go-lr1/question.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>理解LR(1)分析的向前看符号串</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2021/06/27/getting-started/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2021/03/09/in-page-error/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://bittystream.github.io/2021/04/11/go-lr1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://bittystream.github.io/2021/04/11/go-lr1/&text=理解LR(1)分析的向前看符号串"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://bittystream.github.io/2021/04/11/go-lr1/&is_video=false&description=理解LR(1)分析的向前看符号串"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=理解LR(1)分析的向前看符号串&body=Check out this article: http://bittystream.github.io/2021/04/11/go-lr1/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://bittystream.github.io/2021/04/11/go-lr1/&name=理解LR(1)分析的向前看符号串&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://bittystream.github.io/2021/04/11/go-lr1/&t=理解LR(1)分析的向前看符号串"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#FIRST%E9%9B%86"><span class="toc-number">1.</span> <span class="toc-text">FIRST集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FOLLOW%E9%9B%86"><span class="toc-number">2.</span> <span class="toc-text">FOLLOW集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LR%E5%88%86%E6%9E%90%EF%BC%88LR-Parser%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">LR分析（LR Parser）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%A5%E6%9F%84"><span class="toc-number">4.</span> <span class="toc-text">句柄</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%BB%E5%89%8D%E7%BC%80"><span class="toc-number">5.</span> <span class="toc-text">活前缀</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LR-0-%E9%A1%B9%E7%9B%AE"><span class="toc-number">6.</span> <span class="toc-text">LR(0)项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%91%E5%89%8D%E7%9C%8B%E7%AC%A6%E5%8F%B7%E4%B8%B2%EF%BC%88lookahead-string%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">向前看符号串（lookahead string）</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        理解LR(1)分析的向前看符号串
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Bitty的博客</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-04-11T10:24:21.000Z" itemprop="datePublished">2021-04-11</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>最近一周在身心崩溃中度过，但是跟“我貌似会找LR(1)的向前符号串了”并无任何冲突。Anyways，without further ado，下面就用及其低级的措辞谈谈我对LR(1)分析浅薄的理解。</p>
+<p>先用我自己的话对语法分析的几个相关terminology解释一下子。</p>
+<hr>
+<h2 id="FIRST集"><a href="#FIRST集" class="headerlink" title="FIRST集"></a>FIRST集</h2><p>FIRST集为某语法中与某符号（串）相邻并出现在其前方的符号的集合。要确定FIRST(A)可从三个方向考虑（大写字母为非终结符，小写字母为终结符）：</p>
+<ol>
+<li>如果可以得到$A \rightarrow a$，则把a加入$FIRST(A)$</li>
+<li>如果可以得到$A \rightarrow aB$，则把a加入$FIRST(A)$</li>
+<li>如果可以得到$A \rightarrow BC$，则把$FIRST(B)$中的所有非$\epsilon$元素加入$FIRST(A)$</li>
+</ol>
+<h2 id="FOLLOW集"><a href="#FOLLOW集" class="headerlink" title="FOLLOW集"></a>FOLLOW集</h2><p>FOLLOW集为某语法中与某符号（串）相邻并出现在其后方的符号的集合。同样，确定$FOLLOW(A)$也有三个可以考虑的方向：</p>
+<ol>
+<li>如果符号为开始符号S，则将\$置于$FOLLOW(S)$中</li>
+<li>如果可以得到$B\rightarrow aAC$，则把$FIRST(C)$中的所有非空元素加入$FOLLOW(A)$</li>
+<li>如果可以得到$B\rightarrow CA$，则把$FOLLOW(B)$中的所有元素加入$FOLLOW(A)$</li>
+</ol>
+<p>注意是“可以得到”，需要仔细分析产生$\epsilon$的情况。</p>
+<h2 id="LR分析（LR-Parser）"><a href="#LR分析（LR-Parser）" class="headerlink" title="LR分析（LR Parser）"></a>LR分析（LR Parser）</h2><p><em>Wikipedia</em>有言：</p>
+<blockquote>
+<p>An LR parser (Left-to-right, Rightmost derivation in reverse) reads input text from left to right without backing up and produces a rightmost derivation in reverse…</p>
+</blockquote>
+<p>L代表”从左向右扫描符号串“，R代表”最右推导的逆过程“，即最左规约。</p>
+<h2 id="句柄"><a href="#句柄" class="headerlink" title="句柄"></a>句柄</h2><p>句柄为一个语法分析树的最左直接短语。易知，从左向右扫描的时候，句柄为第一个被归约的短语。</p>
+<h2 id="活前缀"><a href="#活前缀" class="headerlink" title="活前缀"></a>活前缀</h2><p>对于一个符号串，其活前缀不能包含句柄右边的符号，即活前缀可以不包含句柄的符号，可以包含句柄的一部分符号，也可以包含句柄的全部符号。在LR分析的过程中用一个栈来存放扫描的字符串，则活前缀可以表示第一次规约发生之前的栈的任意状态。</p>
+<h2 id="LR-0-项目"><a href="#LR-0-项目" class="headerlink" title="LR(0)项目"></a>LR(0)项目</h2><p>LR(k)中的k表示”为了确定分析动作（移进或规约）需要向前看k个输入符号“。因此可知，LR(0)表示只用考察栈的情况就可以知道下一步该做移进还是规约。一个LR(0)项目为包含一个圆点·的产生式，·前的符号为已加入栈参与分析的符号。可以将LR(0)项目分为四种：</p>
+<ol>
+<li>规约项目：·在产生式的最右端的LR(0)项目，即所有符号均已被分析</li>
+<li>接受项目：开始符号S的规约项目</li>
+<li>移进项目：·后的第一个符号为终结符的LR(0)项目</li>
+<li>待约项目：·后的第一个符号为非终结符的LR(0)项目</li>
+</ol>
+<h2 id="向前看符号串（lookahead-string）"><a href="#向前看符号串（lookahead-string）" class="headerlink" title="向前看符号串（lookahead string）"></a>向前看符号串（lookahead string）</h2><p>SLR(1)分析中考虑引入规约项目的FOLLOW集，从而考察一个状态中移进项目·后的那个符号是否在规约项目的FOLLOW集中，如果不在，则可以根据不同的输入符号来进行相应的移进或是规约。但如果不在，就不能解决冲突。<br>向前看符号串是产生式左段非终结符的FOLLOW集的一部分，是对进行规约动作的情况进一步细分。对于一个归约项目，它的向前看符号串表示：当前面临的输入符号串等于向前看符号串时，可进行归约。</p>
+<hr>
+<p>做题的时候发现LR(1)的最大作用就是用向前看符号串对FOLLOW集进行细分，最常见的就是一状态下的待约项目·后的非终结符对应的LR(0)项目被多次加入同一状态的情况，这个非终结符在产生式右边的上下文不同，就导致可能在其后出现的符号串不同，即向前看符号串不同。<br>举个例子。《编译原理与技术》第二版的习题4.19：</p>
+<p><img src="/2021/04/11/go-lr1/question.png" alt></p>
+<p>可见E在产生式的右边出现了不止一次，即E在这个文法中有不同的上下文，可以通过暂时对E重命名，得到不同上下文中的E的FOLLOW集，从而可以得到对应的向前看符号串。</p>
+<p>将文法改写成如下几个产生式：</p>
+<ol>
+<li>$S’ \rightarrow S$</li>
+<li>$S \rightarrow E_1$</li>
+<li>$E \rightarrow E_2 + T$</li>
+<li>$E \rightarrow T$</li>
+<li>$T \rightarrow (E_3)$</li>
+<li>$T \rightarrow a$</li>
+</ol>
+<p>则可以分别写出$E_1、E_2、E_3$的FOLLOW集：<br>$FOLLOW(E_1) = \{ \$ \}$<br>$FOLLOW(E_2) = \{ + \}$<br>$FOLLOW(E_3) = \{ ) \}$</p>
+<p>对于由LR(0)项目$S\rightarrow ·E$中的E所引入的新项目，它们的向前看符号串为$E_1$的FOLLOW集，即\$。<br>对于由LR(0)项目$E\rightarrow ·E + T$中的E所引入的新项目，它们的向前看符号串为$E_2$的FOLLOW集，即+。<br>而对于由LR(0)项目$T\rightarrow (·E)$所引入的新项目，它们的向前看符号串为$E_3$的FOLLOW集，即 )。<br>这样便实现了FOLLOW集的细化，让语法分析动作执行更加准确。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#FIRST%E9%9B%86"><span class="toc-number">1.</span> <span class="toc-text">FIRST集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FOLLOW%E9%9B%86"><span class="toc-number">2.</span> <span class="toc-text">FOLLOW集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LR%E5%88%86%E6%9E%90%EF%BC%88LR-Parser%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">LR分析（LR Parser）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%A5%E6%9F%84"><span class="toc-number">4.</span> <span class="toc-text">句柄</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B4%BB%E5%89%8D%E7%BC%80"><span class="toc-number">5.</span> <span class="toc-text">活前缀</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LR-0-%E9%A1%B9%E7%9B%AE"><span class="toc-number">6.</span> <span class="toc-text">LR(0)项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%91%E5%89%8D%E7%9C%8B%E7%AC%A6%E5%8F%B7%E4%B8%B2%EF%BC%88lookahead-string%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">向前看符号串（lookahead string）</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://bittystream.github.io/2021/04/11/go-lr1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://bittystream.github.io/2021/04/11/go-lr1/&text=理解LR(1)分析的向前看符号串"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://bittystream.github.io/2021/04/11/go-lr1/&is_video=false&description=理解LR(1)分析的向前看符号串"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=理解LR(1)分析的向前看符号串&body=Check out this article: http://bittystream.github.io/2021/04/11/go-lr1/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://bittystream.github.io/2021/04/11/go-lr1/&title=理解LR(1)分析的向前看符号串"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://bittystream.github.io/2021/04/11/go-lr1/&name=理解LR(1)分析的向前看符号串&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://bittystream.github.io/2021/04/11/go-lr1/&t=理解LR(1)分析的向前看符号串"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2021
+    Liao yz
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+</body>
+</html>

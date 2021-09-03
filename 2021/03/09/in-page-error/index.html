@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="好久没写博客了，记录一下子。 这学期选了多媒体课，做作业会用到Pr，没想到打开一个项目把素材拖到时间轴的时候居然直接要给Adobe发送崩溃报告？查看报错信息，显示的是EXCEPTION_IN_PAGE_ERROR。在win32文档里查到了关于这个异常的定义，大概就是说线程访问了无法加载的页，这个异常是在读写映射文件而不是页文件的时候导致的。  The thread tried to access">
+<meta property="og:type" content="article">
+<meta property="og:title" content="具有较好的内存管理意识">
+<meta property="og:url" content="http://bittystream.github.io/2021/03/09/in-page-error/index.html">
+<meta property="og:site_name" content="Bitty的博客">
+<meta property="og:description" content="好久没写博客了，记录一下子。 这学期选了多媒体课，做作业会用到Pr，没想到打开一个项目把素材拖到时间轴的时候居然直接要给Adobe发送崩溃报告？查看报错信息，显示的是EXCEPTION_IN_PAGE_ERROR。在win32文档里查到了关于这个异常的定义，大概就是说线程访问了无法加载的页，这个异常是在读写映射文件而不是页文件的时候导致的。  The thread tried to access">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-03-09T08:19:34.000Z">
+<meta property="article:modified_time" content="2021-03-09T08:24:41.109Z">
+<meta property="article:author" content="Liao yz">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>具有较好的内存管理意识</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/2021/04/11/go-lr1/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/2020/09/20/week3/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://bittystream.github.io/2021/03/09/in-page-error/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://bittystream.github.io/2021/03/09/in-page-error/&text=具有较好的内存管理意识"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://bittystream.github.io/2021/03/09/in-page-error/&is_video=false&description=具有较好的内存管理意识"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=具有较好的内存管理意识&body=Check out this article: http://bittystream.github.io/2021/03/09/in-page-error/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://bittystream.github.io/2021/03/09/in-page-error/&name=具有较好的内存管理意识&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://bittystream.github.io/2021/03/09/in-page-error/&t=具有较好的内存管理意识"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        具有较好的内存管理意识
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Bitty的博客</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-03-09T08:19:34.000Z" itemprop="datePublished">2021-03-09</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>好久没写博客了，记录一下子。</p>
+<p>这学期选了多媒体课，做作业会用到Pr，没想到打开一个项目把素材拖到时间轴的时候居然直接要给Adobe发送崩溃报告？查看报错信息，显示的是EXCEPTION_IN_PAGE_ERROR。在win32文档里查到了关于这个异常的定义，大概就是说线程访问了无法加载的页，这个异常是在读写映射文件而不是页文件的时候导致的。</p>
+<blockquote>
+<p>The thread tried to access a page that was not present, and the system was unable to load the page. For example, this exception might occur if a network connection is lost while running a program over the network.</p>
+</blockquote>
+<p>Pr报这个异常后，蓝屏接踵而至，报错为KERNEL_DATA_INPAGE_ERROR。有可能是虚拟内存页面文件中存在坏簇、病毒、磁盘控制其错误、内存有问题。从页面文件读/加载存储在硬盘驱动器的信息存在一些问题。 </p>
+<p>反复卸载安装各个版本的Pr，没有结果。用图形界面里的磁盘碎片整理工具挨了一下午，没有结果。开始在电商平台和问答网站物色新电脑，但作为一个边缘人，三问何去何从，竟难以从各色笔记本中找到真正适合自己在未来长期使用的那一款。深夜深思，辗转反侧：多媒体技术，你就是我的蚁穴？</p>
+<p>是日下午再次搜索INPAGE ERROR，发现用chkdsk命令来修复磁盘也是一种办法。一个多小时过去，第四个阶段的修复已完毕，电脑自动重启。惊坐起，打开Pr。很卡很慢，心想，也不能全怪这磁盘修复，毕竟刚开机的时候都不快。随后不抱任何希望地随便点开一个名为test_again的项目，它之前还有test、test_1、test_2，它们都为我带来了崩溃报告；不抱任何希望地随便点开一个文件夹；不抱任何希望地随便导入一个视频，然后把它拖到进度条上。</p>
+<p>没有崩溃报告，视频正常导入播放，可以正常地编辑。尖叫几声，奔走相告，然后写下了这些无聊的文字。</p>
+<p>如果chkdsk /r没有用，或许我会下载更古早版本的Pr。或者我根本不会用Pr。或许我会重装系统。反正，换电脑是没那么斩钉截铁的，永远都不会。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://bittystream.github.io/2021/03/09/in-page-error/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://bittystream.github.io/2021/03/09/in-page-error/&text=具有较好的内存管理意识"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://bittystream.github.io/2021/03/09/in-page-error/&is_video=false&description=具有较好的内存管理意识"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=具有较好的内存管理意识&body=Check out this article: http://bittystream.github.io/2021/03/09/in-page-error/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://bittystream.github.io/2021/03/09/in-page-error/&title=具有较好的内存管理意识"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://bittystream.github.io/2021/03/09/in-page-error/&name=具有较好的内存管理意识&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://bittystream.github.io/2021/03/09/in-page-error/&t=具有较好的内存管理意识"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2021
+    Liao yz
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">writing</a></li>
+         
+          <li><a href="/about/">About</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+</body>
+</html>
